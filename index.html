@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EDM – Easy Download Manager | Fast, Secure & Smart Downloader</title>
+  <meta name="description" content="EDM is a fast, reliable, and lightweight download manager for Android. Experience high-speed multi-threaded downloads, auto-resume, and background downloading.">
+  
+  <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#090d16" media="(prefers-color-scheme: dark)">
+  
+  <meta property="og:title" content="EDM – Easy Download Manager">
+  <meta property="og:description" content="Fast, reliable, and lightweight download manager for Android with multi-threaded downloading and auto-resume.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://easydownloadmanager.com/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232563eb'><path d='M12 2v13m0 0l-5-5m5 5l5-5M4 19h16' stroke='%232563eb' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+
+  <style>
+    :root {
+      --bg-primary: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #ffffff;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --accent-alpha: rgba(37, 99, 235, 0.08);
+      --accent-alpha-hover: rgba(37, 99, 235, 0.14);
+      --border: #e2e8f0;
+      --border-subtle: #edf2f7;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --radius-pill: 9999px;
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+      --shadow-lg: 0 20px 30px -10px rgba(37, 99, 235, 0.18);
+      --max-width: 1120px;
+      --transition: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary: #090d16;
+        --bg-surface: #0f1726;
+        --bg-surface-elevated: #162034;
+        --text-primary: #f8fafc;
+        --text-secondary: #94a3b8;
+        --text-muted: #64748b;
+        --accent: #3b82f6;
+        --accent-hover: #60a5fa;
+        --accent-alpha: rgba(59, 130, 246, 0.12);
+        --accent-alpha-hover: rgba(59, 130, 246, 0.2);
+        --border: #1e293b;
+        --border-subtle: #182234;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 12px 28px -6px rgba(0, 0, 0, 0.45);
+        --shadow-lg: 0 20px 35px -10px rgba(59, 130, 246, 0.25);
+      }
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      top: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 450px;
+      background: radial-gradient(50% 50% at 50% 50%, var(--accent-alpha) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .wrap {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background-color: rgba(248, 250, 252, 0.82);
+      border-bottom: 1px solid var(--border);
+      z-index: 50;
+      transition: background-color var(--transition);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      header {
+        background-color: rgba(9, 13, 22, 0.82);
+      }
+    }
+
+    header .wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 4.5rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      border-radius: var(--radius-sm);
+      display: grid;
+      place-items: center;
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.65rem;
+      border-radius: var(--radius-pill);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all var(--transition);
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .btn-primary {
+      background: var(--text-primary);
+      color: var(--bg-primary);
+      padding: 0.85rem 1.85rem;
+      font-size: 1.05rem;
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .btn-sm {
+      padding: 0.5rem 1.25rem;
+      font-size: 0.875rem;
+    }
+
+    .hero {
+      padding: 5.5rem 0 4.5rem;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      background: var(--accent-alpha);
+      color: var(--accent);
+      border: 1px solid rgba(37, 99, 235, 0.15);
+      border-radius: var(--radius-pill);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.35rem, 5.5vw, 4rem);
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      line-height: 1.15;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero-gradient {
+      background: linear-gradient(135deg, var(--accent), #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
+      color: var(--text-secondary);
+      max-width: 680px;
+      margin: 0 auto 2.5rem;
+      font-weight: 400;
+    }
+
+    .features {
+      padding: 4.5rem 0;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 3.5rem;
+    }
+
+    .section-title {
+      font-size: clamp(1.75rem, 3.5vw, 2.25rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-subtitle {
+      color: var(--text-secondary);
+      font-size: 1rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.75rem;
+    }
+
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.25rem 2rem;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--accent);
+    }
+
+    .card-icon {
+      width: 52px;
+      height: 52px;
+      background: var(--accent-alpha);
+      color: var(--accent);
+      border-radius: var(--radius-sm);
+      display: grid;
+      place-items: center;
+      margin-bottom: 1.5rem;
+      transition: background-color var(--transition);
+    }
+
+    .card:hover .card-icon {
+      background: var(--accent-alpha-hover);
+    }
+
+    .card h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.65rem;
+      letter-spacing: -0.01em;
+    }
+
+    .card p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+
+    .faq {
+      padding: 4.5rem 0;
+    }
+
+    .faq-list {
+      max-width: 760px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    details {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 1.25rem 1.5rem;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+
+    details:hover {
+      border-color: var(--accent);
+    }
+
+    details[open] {
+      box-shadow: var(--shadow-sm);
+      border-color: var(--accent);
+    }
+
+    summary {
+      font-weight: 600;
+      font-size: 1.05rem;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary::marker {
+      display: none;
+    }
+
+    .faq-icon {
+      width: 20px;
+      height: 20px;
+      color: var(--accent);
+      transition: transform var(--transition);
+      flex-shrink: 0;
+    }
+
+    details[open] .faq-icon {
+      transform: rotate(180deg);
+    }
+
+    details p {
+      margin-top: 0.85rem;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 3rem 0;
+      margin-top: 5rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    footer .wrap {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    footer nav {
+      display: flex;
+      gap: 1.75rem;
+    }
+
+    footer a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color var(--transition);
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    @media (max-width: 640px) {
+      .hero {
+        padding: 3.5rem 0 3rem;
+      }
+      
+      .btn-primary {
+        width: 100%;
+      }
+      
+      footer .wrap {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, ::before, ::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="wrap">
+      <a href="#" class="brand" aria-label="EDM Home">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v12M5 12l7 7 7-7M4 21h16"/>
+          </svg>
+        </div>
+        <span>EDM</span>
+      </a>
+      <a class="btn btn-primary btn-sm" href="https://play.google.com/store/apps/details?id=com.easydownloadmanager.edm" target="_blank" rel="noopener">
+        Get App
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <div class="badge">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          Lightning Fast Downloads
+        </div>
+        <h1>Easy Download Manager<br><span class="hero-gradient">for Android</span></h1>
+        <p>Accelerate your downloads up to 5x with multi-threading, automatic link catching, background transfers, and full pause/resume capabilities.</p>
+        <a class="btn btn-primary" href="https://play.google.com/store/apps/details?id=com.easydownloadmanager.edm" target="_blank" rel="noopener">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3.609 1.814L13.792 12 3.61 22.186a2.372 2.372 0 0 1-.61-1.613V3.427c0-.622.228-1.201.61-1.613zM15.206 13.414l2.793 2.793-12.75 7.362 9.957-10.155zM17.999 10.621l3.527 2.037c.801.463.801 1.217 0 1.68l-3.527 2.037-2.793-2.793 2.793-2.961zM15.206 10.586L5.249 0.431l12.75 7.362-2.793 2.793z"/>
+          </svg>
+          Get it on Google Play
+        </a>
+      </div>
+    </section>
+
+    <section class="features">
+      <div class="wrap">
+        <div class="section-header">
+          <h2 class="section-title">Engineered for Maximum Speed</h2>
+          <p class="section-subtitle">Everything you need to handle large files effortlessly</p>
+        </div>
+        <div class="grid">
+          <article class="card">
+            <div class="card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <h3>Multi-Thread Acceleration</h3>
+            <p>Splits files into parallel segments to maximize bandwidth utilization and finish downloads significantly faster.</p>
+          </article>
+
+          <article class="card">
+            <div class="card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+            </div>
+            <h3>Smart Auto-Resume</h3>
+            <p>Interrupted connection? Seamlessly resume broken or paused downloads without having to start over from scratch.</p>
+          </article>
+
+          <article class="card">
+            <div class="card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <h3>Privacy First</h3>
+            <p>Zero tracking, no invasive permissions, and clean local file operations designed with strict battery optimization.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="faq">
+      <div class="wrap">
+        <div class="section-header">
+          <h2 class="section-title">Frequently Asked Questions</h2>
+          <p class="section-subtitle">Quick answers to common questions about EDM</p>
+        </div>
+        <div class="faq-list">
+          <details>
+            <summary>
+              <span>Is EDM free to use?</span>
+              <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </summary>
+            <p>Yes, EDM is completely free to download and use with all essential download management features enabled.</p>
+          </details>
+
+          <details>
+            <summary>
+              <span>Does EDM support background downloads?</span>
+              <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </summary>
+            <p>Yes, EDM features robust background service management that keeps your downloads running smoothly even when the screen is off or you switch apps.</p>
+          </details>
+
+          <details>
+            <summary>
+              <span>How does multi-threading speed up downloads?</span>
+              <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </summary>
+            <p>EDM splits large files into multiple smaller segments, downloading them concurrently using parallel network connections to maximize speed.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>© 2026 EDM – Easy Download Manager</span>
+      <nav aria-label="Footer Navigation">
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="mailto:support@easydownloadmanager.com">Contact Support</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        const targetId = this.getAttribute('href');
+        if (targetId && targetId !== '#') {
+          const target = document.querySelector(targetId);
+          if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
